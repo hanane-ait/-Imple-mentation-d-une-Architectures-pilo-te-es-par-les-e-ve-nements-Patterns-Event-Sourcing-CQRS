@@ -1,0 +1,38 @@
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: es-accounts-postgres
+    environment:
+      POSTGRES_DB: es-accounts_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: "1234"
+    volumes:
+      - es-accounts_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - es-accounts-net
+    restart: unless-stopped
+
+  pgadmin4:
+    image: dpage/pgadmin4
+    container_name: es-accounts-pgadmin
+    restart: unless-stopped
+    ports:
+      - "8088:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: med@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: azer
+    volumes:
+      - es-accounts_pgadmin_data:/var/lib/pgadmin
+    networks:
+      - es-accounts-net
+
+volumes:
+  es-accounts_data:
+  es-accounts_pgadmin_data:
+
+networks:
+  es-accounts-net:
+    driver: bridge
