@@ -3,11 +3,13 @@ package demoescsrsaxon.commands.aggregates;
 
 import demoescsrsaxon.commands.commands.AddAccountCommand;
 import demoescsrsaxon.commands.commands.CreditAccountCommand;
+import demoescsrsaxon.commands.commands.DebitAccountCommand;
 import demoescsrsaxon.enums.AccountStatus;
 import demoescsrsaxon.events.AccountActivatedEvent;
 import demoescsrsaxon.events.AccountCreatedEvent;
 
 import demoescsrsaxon.events.AccountCreditedEvent;
+import demoescsrsaxon.events.AccountDebitedEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import org.axonframework.commandhandling.CommandHandler;
@@ -95,5 +97,25 @@ public class AccountAggregate {
 
     }
 
+    @CommandHandler
+    public void handle(DebitAccountCommand command){
+        log.info("############# DebitAccountCommand Received #############");
+        if(!status.equals(AccountStatus.ACTIVATED)) throw new RuntimeException("The account "+command.getId()+" is not activated");
+        if(balance < command.getAmount()) throw new RuntimeException("Balance Not sufficient Exception");
+        if (command.getAmount() <= 0) throw new IllegalArgumentException("Amount must be positive");
+
+        AggregateLifecycle.apply(new AccountDebitedEvent(
+                command.getId(),
+                command.getAmount(),
+                command.getCurrency()
+        ));
+    }
+
+    @EventSourcingHandler
+    public void on(AccountDebitedEvent event){
+        log.info("############# AccountDebitedEvent occured #############");
+        this.accountId = event.getAccountId();
+        this.balance= this.balance - event.getAmount();
+    }
 
 }

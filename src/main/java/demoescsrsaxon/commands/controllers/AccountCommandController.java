@@ -3,9 +3,11 @@ package demoescsrsaxon.commands.controllers;
 
 import demoescsrsaxon.commands.commands.AddAccountCommand;
 import demoescsrsaxon.commands.commands.CreditAccountCommand;
+import demoescsrsaxon.commands.commands.DebitAccountCommand;
 import demoescsrsaxon.commands.dtos.AddNewAccountRequestDTO;
 import demoescsrsaxon.commands.dtos.CreditAccountRequestDTO;
 
+import demoescsrsaxon.commands.dtos.DebitAccountRequestDTO;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 
@@ -63,5 +65,15 @@ public class AccountCommandController {
                 request.amount(),
                 request.currency()
         ));
+    }
+
+    @PostMapping("/debit")
+    public CompletableFuture<String> debitAccount(@RequestBody DebitAccountRequestDTO request){
+        CompletableFuture<String> response = commandGateway.send(new DebitAccountCommand(
+                request.accountId(),
+                request.amount(),
+                request.currency()
+        ));
+        return response;
     }
 }
