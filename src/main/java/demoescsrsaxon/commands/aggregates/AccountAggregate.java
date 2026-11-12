@@ -4,12 +4,10 @@ package demoescsrsaxon.commands.aggregates;
 import demoescsrsaxon.commands.commands.AddAccountCommand;
 import demoescsrsaxon.commands.commands.CreditAccountCommand;
 import demoescsrsaxon.commands.commands.DebitAccountCommand;
+import demoescsrsaxon.commands.commands.UpdateAccountStatusCommand;
 import demoescsrsaxon.enums.AccountStatus;
-import demoescsrsaxon.events.AccountActivatedEvent;
-import demoescsrsaxon.events.AccountCreatedEvent;
+import demoescsrsaxon.events.*;
 
-import demoescsrsaxon.events.AccountCreditedEvent;
-import demoescsrsaxon.events.AccountDebitedEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import org.axonframework.commandhandling.CommandHandler;
@@ -117,5 +115,24 @@ public class AccountAggregate {
         this.accountId = event.getAccountId();
         this.balance= this.balance - event.getAmount();
     }
+
+    @CommandHandler
+    public void handle(UpdateAccountStatusCommand command){
+        log.info("############# UpdateAccountStatusCommand Received #############");
+        if(command.getStatus()==status) throw new RuntimeException("This account "+command.getId()+" Is already is"+command.getStatus());
+        AggregateLifecycle.apply(new AccountStatusUpdatedEvent(
+                command.getId(),
+                command.getStatus()
+        ));
+    }
+
+    @EventSourcingHandler
+    public void on(AccountStatusUpdatedEvent event){
+        log.info("############# AccountStatusUpdatedEvent occured #############");
+        this.accountId = event.getAccountId();
+        this.status = event.getStatus();
+    }
+
+
 
 }

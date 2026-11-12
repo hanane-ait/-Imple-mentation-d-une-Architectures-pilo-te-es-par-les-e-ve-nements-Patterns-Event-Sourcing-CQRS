@@ -4,10 +4,12 @@ package demoescsrsaxon.commands.controllers;
 import demoescsrsaxon.commands.commands.AddAccountCommand;
 import demoescsrsaxon.commands.commands.CreditAccountCommand;
 import demoescsrsaxon.commands.commands.DebitAccountCommand;
+import demoescsrsaxon.commands.commands.UpdateAccountStatusCommand;
 import demoescsrsaxon.commands.dtos.AddNewAccountRequestDTO;
 import demoescsrsaxon.commands.dtos.CreditAccountRequestDTO;
 
 import demoescsrsaxon.commands.dtos.DebitAccountRequestDTO;
+import demoescsrsaxon.commands.dtos.UpdateAccountStatusRequestDTO;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 
@@ -76,4 +78,14 @@ public class AccountCommandController {
         ));
         return response;
     }
+    @PutMapping("/updateStatus")
+    public CompletableFuture<String> updateStatus(@RequestBody UpdateAccountStatusRequestDTO request){
+        CompletableFuture<String> response = commandGateway.send(new UpdateAccountStatusCommand(
+                request.accountId(),
+                request.status()
+        ));
+        return response;
+    }
+
+
 }
