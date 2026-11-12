@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.Date;
 @Entity
 @Builder
@@ -17,8 +18,8 @@ import java.util.Date;
 public class Account {
     @Id
     private String id;
+    private Instant createdAt;
     private double balance;
-    private Date createdAt;
     @Enumerated(EnumType.STRING)
     private AccountStatus status;
     private String currency;
