@@ -1,10 +1,7 @@
 package demoescsrsaxon.query.handlers;
 
 import demoescsrsaxon.enums.OperationType;
-import demoescsrsaxon.events.AccountActivatedEvent;
-import demoescsrsaxon.events.AccountCreatedEvent;
-import demoescsrsaxon.events.AccountCreditedEvent;
-import demoescsrsaxon.events.AccountStatusUpdatedEvent;
+import demoescsrsaxon.events.*;
 import demoescsrsaxon.query.entities.Account;
 import demoescsrsaxon.query.entities.AccountOperation;
 import demoescsrsaxon.query.repository.AccountRepository;
@@ -12,6 +9,7 @@ import demoescsrsaxon.query.repository.OperationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventhandling.EventMessage;
+import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,10 +17,12 @@ import org.springframework.stereotype.Component;
 public class AccountEventHandler {
     private AccountRepository accountRepository;
     private OperationRepository operationRepository;
+    private QueryUpdateEmitter queryUpdateEmitter;
 
-    public AccountEventHandler(AccountRepository accountRepository, OperationRepository operationRepository) {
+    public AccountEventHandler(AccountRepository accountRepository, OperationRepository operationRepository, QueryUpdateEmitter queryUpdateEmitter) {
         this.accountRepository = accountRepository;
         this.operationRepository = operationRepository;
+        this.queryUpdateEmitter = queryUpdateEmitter;
     }
 
     @EventHandler
@@ -68,6 +68,24 @@ public class AccountEventHandler {
         operationRepository.save(accountOperation);
         account.setBalance(account.getBalance()+accountOperation.getAmount());
         accountRepository.save(account);
+        queryUpdateEmitter.emit (e->true, accountOperation);
+    }
+
+    @EventHandler
+    public void on (AccountDebitedEvent event, EventMessage eventMessage){
+        log.info("============== Query Side AccountDebitedEvent Recived ==============");
+        Account account = accountRepository.findById(event.getAccountId()).get();
+        AccountOperation accountOperation = AccountOperation.builder()
+                .amount(event.getAmount())
+                .date(eventMessage.getTimestamp())
+                .type(OperationType.DEBIT)
+                .currency(event.getCurrency())
+                .account(account)
+                .build();
+        operationRepository.save(accountOperation);
+        account.setBalance(account.getBalance()-accountOperation.getAmount());
+        accountRepository.save(account);
+        queryUpdateEmitter.emit (e->true, accountOperation);
     }
 
 }

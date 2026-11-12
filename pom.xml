@@ -60,15 +60,15 @@
             <groupId>org.axonframework</groupId>
             <artifactId>axon-spring-boot-starter</artifactId>
             <version>${axon.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.axonframework</groupId>
-                    <artifactId>axon-server-connector</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!--   <exclusions> >
+             <exclusion>
+                 <groupId>org.axonframework</groupId>
+                 <artifactId>axon-server-connector</artifactId>
+             </exclusion>
+         </exclusions>-->
+     </dependency>
 
-        <!-- Lombok : réduction du code Java répétitif -->
+     <!-- Lombok : réduction du code Java répétitif -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -87,6 +87,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>3.7.2</version>
         </dependency>
 
     </dependencies>
