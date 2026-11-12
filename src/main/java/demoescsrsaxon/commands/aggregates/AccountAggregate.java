@@ -54,4 +54,6 @@ public class AccountAggregate {
         this.balance = event.getInitialBalance();
         this.status = event.getStatus();
     }
+
+
 }

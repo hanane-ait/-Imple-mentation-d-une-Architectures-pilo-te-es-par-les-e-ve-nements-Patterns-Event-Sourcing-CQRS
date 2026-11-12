@@ -1,7 +1,9 @@
 package demoescsrsaxon.commands.controllers;
 
 import demoescsrsaxon.commands.commands.AddAccountCommand;
+import demoescsrsaxon.commands.commands.CreditAccountCommand;
 import demoescsrsaxon.commands.dtos.AddNewAccountRequestDTO;
+import demoescsrsaxon.commands.dtos.CreditAccountRequestDTO;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.springframework.web.bind.annotation.*;
@@ -42,4 +44,16 @@ public class AccountCommandController {
     public Stream eventStore(@PathVariable String accountId){
         return eventStore.readEvents(accountId).asStream();
     }
+
+    @PostMapping("/credit")
+    public CompletableFuture<String> creditAccount(@RequestBody CreditAccountRequestDTO request){
+        CompletableFuture<String> response = commandGateway.send(new CreditAccountCommand(
+                request.accountId(),
+                request.amount(),
+                request.currency()
+        ));
+        return response;
+    }
+
+
 }
